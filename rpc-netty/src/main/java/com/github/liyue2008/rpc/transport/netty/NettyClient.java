@@ -71,8 +71,8 @@ public class NettyClient implements TransportClient {
             ioEventGroup = newIoEventGroup();
         }
         if (bootstrap == null){
-            ChannelHandler channelHandlerPipeline = newChannelHandlerPipeline();
-            bootstrap = newBootstrap(channelHandlerPipeline, ioEventGroup);
+            ChannelHandler channelHandler = newChannelHandler();
+            bootstrap = newBootstrap(channelHandler, ioEventGroup);
         }
             ChannelFuture channelFuture;
             Channel channel;
@@ -87,14 +87,19 @@ public class NettyClient implements TransportClient {
             channels.add(channel);
             return channel;
     }
-    private ChannelHandler newChannelHandlerPipeline() {
+    private ChannelHandler newChannelHandler() {
+        /*
+          执行时从尾部向前逐步查找执行outbound(写出【obj -> bytes】)的handler，参考：io.netty.channel.AbstractChannelHandlerContext#findContextOutbound()
+          执行时从头部向后逐步查找执行inbound(读入【bytes -> obj】）的handler，参考：io.netty.channel.AbstractChannelHandlerContext#findContextInbound()
+          所以需注意整体分别设置读和写两个各自的责任链顺序，至于局部读或写handler，谁在谁前是无所谓的；
+         */
         return new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
                         .addLast(new ResponseDecoder())
-                        .addLast(new RequestEncoder())
-                        .addLast(new ResponseInvocation(inFlightRequests));
+                        .addLast(new ResponseInvocation(inFlightRequests))
+                        .addLast(new RequestEncoder());
             }
         };
     }

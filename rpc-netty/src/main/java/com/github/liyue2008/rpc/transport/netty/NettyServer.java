@@ -48,8 +48,8 @@ public class NettyServer implements TransportServer {
         this.requestHandlerRegistry = requestHandlerRegistry;
         EventLoopGroup acceptEventGroup = newEventLoopGroup();
         EventLoopGroup ioEventGroup = newEventLoopGroup();
-        ChannelHandler channelHandlerPipeline = newChannelHandlerPipeline();
-        ServerBootstrap serverBootstrap = newBootstrap(channelHandlerPipeline, acceptEventGroup, ioEventGroup);
+        ChannelHandler channelHandler = newChannelHandler();
+        ServerBootstrap serverBootstrap = newBootstrap(channelHandler, acceptEventGroup, ioEventGroup);
         Channel channel = doBind(serverBootstrap);
 
         this.acceptEventGroup = acceptEventGroup;
@@ -85,7 +85,10 @@ public class NettyServer implements TransportServer {
         }
     }
 
-    private ChannelHandler newChannelHandlerPipeline() {
+    private ChannelHandler newChannelHandler() {
+        /*
+            解释同com.github.liyue2008.rpc.transport.netty.NettyClient.newChannelHandler
+         */
         return new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel channel) {

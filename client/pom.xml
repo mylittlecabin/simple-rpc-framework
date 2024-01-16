@@ -50,7 +50,7 @@
             <groupId>com.github.liyue2008</groupId>
             <artifactId>rpc-netty</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
+<!--            <scope>runtime</scope>-->
         </dependency>
     </dependencies>
     <build>

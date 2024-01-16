@@ -40,7 +40,7 @@ public class NettyTransport implements Transport {
 
     @Override
     public  CompletableFuture<Command> send(Command request) {
-        // 构建返回值
+        // 构建返回值(客户端在com.github.liyue2008.rpc.transport.netty.ResponseInvocation.channelRead0 这里收到响应后再移除掉）
         CompletableFuture<Command> completableFuture = new CompletableFuture<>();
         try {
             // 将在途请求放到inFlightRequests中
